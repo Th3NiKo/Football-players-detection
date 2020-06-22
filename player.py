@@ -16,7 +16,7 @@ class Player:
         self.historyRemember = 200
         self.historyPoints = []
         self.isAlreadyLabaled = False
-    
+
     def updatePosition(self,newx, newy):
         self.historyPoints.append(self.getPoint2F())
         self.x = newx
@@ -24,7 +24,7 @@ class Player:
         self.isAlreadyLabaled = True
         if len(self.historyPoints) > self.historyRemember:
             self.historyPoints.pop(0)
-    
+
     def getPoint2F(self):
         return (self.x,self.y)
 
@@ -49,17 +49,20 @@ class Player:
             if actual_frame > 100:
                 predicted = self.kalmanFilter.predictPosition()
                 #self.updatePosition(int(predicted[0]),int(predicted[1]))
-            else: 
+            else:
                 self.tryFindPos(allDistances)
-        
+
     def drawPlayerAsCircle(self,img):
         cv2.circle(img,self.getPoint2F(), 5, (255,255,255), -1)
         cv2.putText(img,self.label, (self.x-25, self.y-10),  cv2.FONT_HERSHEY_SIMPLEX, 0.3,(255,255,255))
 
     def drawPlayerOnPitch(self,img):
+
         point2d = neural.transformPoint(self.getPoint2F())
-        cv2.circle(img,(point2d[0], point2d[1]), 8, (50,255,0), -1)
-        cv2.putText(img,self.label, (point2d[0]-25, point2d[1]-10),  cv2.FONT_HERSHEY_SIMPLEX, 0.3,(50,255,0))
+        x = int(point2d[0].item())
+        y = int(point2d[1].item())
+        cv2.circle(img,(x,y) , 8, (50,255,0), -1)
+        cv2.putText(img,self.label, (x-25, y-10),  cv2.FONT_HERSHEY_SIMPLEX, 0.3,(50,255,0))
 
     def drawPlayerHistory(self,video_img, pitch_img):
         for pt in self.historyPoints:
@@ -67,7 +70,7 @@ class Player:
             point2t = neural.transformPoint(pt)
             cv2.circle(pitch_img,point2t, 1, (50,255,0), -1)
 
-    
+
     #Try to find using history
     def tryFindPos(self,distances):
         #Loop through history and find where player was going
@@ -102,18 +105,18 @@ class Player:
             distance =  math.sqrt(math.pow(point[0] - newx,2) + math.pow(point[1] - newy,2))
             if distance < actualDistance:
                     actualDistance = distance
-                    actualNearest = point 
-        #print(actualDistance) 
+                    actualNearest = point
+        #print(actualDistance)
         if actualDistance < 25:
             self.updatePosition(int(actualNearest[0]),int(actualNearest[1]))
             self.isAlreadyLabaled = True
         else:
             self.isAlreadyLabaled = False
-        
+
 
 #Try to update positions of all players in given list
 def updateAllPlayers(playersList,keypointsTeam1,keypointsTeam2,actual_frame):
-    for player in playersList: 
+    for player in playersList:
         if player.team == 1:
             player.updateToNearest(keypointsTeam1, actual_frame)
         elif player.team == 2:
