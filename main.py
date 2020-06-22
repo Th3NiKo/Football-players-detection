@@ -1,6 +1,6 @@
 #Imports
 import cv2
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 import colorsys
 import imutils
@@ -20,14 +20,12 @@ pitch = cv2.imread('field.png',1)
 player1 = player.Player(565,104,"Zawodnik 1",1)
 player2 = player.Player(875,52,"Zawodnik 2",1)
 player3 = player.Player(728,101,"Zawodnik 3",1)
-player4 = player.Player(619,99,"Zawodnik 4",1)
-player5 = player.Player(776,63,"Zawodnik 5",1)
 
 #Prepare mouse events
 cv2.namedWindow('Video')
 cv2.setMouseCallback('Video',vision.get_mouse,param=player1)
 
-allPlayers = [player1,player2,player3,player4,player5]
+allPlayers = [player1,player2,player3]
 #allPlayers = [player1]
 
 #Create writers for output to files
@@ -39,38 +37,38 @@ while True:
     count = count + 1 #frame count
     ret,frame = video.read()
     #a = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
-    
+
     if not frame is None :
-        
+
         #Crop image and remove static background
         frame = vision.crop_frame(frame)
 
         fgMask = vision.backSub.apply(frame)
-       
+
         #Get masks for each team
         hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, vision.lower_team1, vision.upper_team1)
         mask2 = cv2.inRange(hsv, vision.lower_team2, vision.upper_team2)
-        
+
         #Do masking
         res = cv2.bitwise_and(fgMask, fgMask, mask=mask)
-        
+
         res2 = cv2.bitwise_and(fgMask, fgMask, mask=mask2)
 
         #Do Morphologic
-        
+
 
         #Detect blobs for each team
         keypointsTeam1 = vision.detector.detect(res)
         keypointsTeam2 = vision.detector.detect(res2)
 
-        #Try to update player positions    
+        #Try to update player positions
         player.updateAllPlayers(allPlayers,keypointsTeam1,keypointsTeam2,count)
-        
+
         #Draw players actual positions
         pitchTemp = cv2.cvtColor(pitch.copy(),cv2.COLOR_BGR2RGB)
         player.drawAllPlayers(allPlayers, frame, pitchTemp)
-        
+
 
         #frame = cv2.drawKeypoints(frame, keypointsTeam1, np.array([]),(255,0,0), cv2.DRAW_MATCHES_FLAGS_DEFAULT)
         #frame = cv2.drawKeypoints(frame, keypointsTeam2, np.array([]),(0,0,255), cv2.DRAW_MATCHES_FLAGS_DEFAULT)
@@ -83,10 +81,10 @@ while True:
                 r = x / 1645 * 255
                 g = y / 238 * 255
                 b = (x + y)/ (1645 + 238) * 255
-                frame = cv2.line(frame, (x,y), (x,y), (r, g, b), 1) 
+                frame = cv2.line(frame, (x,y), (x,y), (r, g, b), 1)
                 newpt = neural.transformPoint((x,y))
-                pitchTemp = cv2.line(pitchTemp, newpt, newpt, (r, g, b), 1) 
-        
+                pitchTemp = cv2.line(pitchTemp, newpt, newpt, (r, g, b), 1)
+
         if count > 100 and count % 25 == 0:
             vision.extract_players(fgMask,frame,150,420,count)
         '''
