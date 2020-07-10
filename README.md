@@ -47,6 +47,8 @@ Load neural network model for translating video points to 2D field representatio
 Learn neural network model for translating sample video points to 2D field (*field.png*).
 ###### kalman.py
 Prepare kalman filter class for player movement predictions
+###### homography.py
+Homography matrix for point from video to 2D translation
 
 ### Wiki
 https://github.com/Th3NiKo/Football-players-detection/wiki
