@@ -29,4 +29,24 @@ pip3 install imutils
 ```
 
 ## Usage
-To do
+### Quick usage
+Download video from link above and use
+```
+python3 main.py
+```
+### Quick overview of scripts
+###### main.py
+All scripts and functions gathered up together. 
+###### vision.py
+Various functions connected with computer vision.
+###### player.py
+Class representing football player.
+###### neural.py
+Load neural network model for translating video points to 2D field representation.
+###### learnpoints.py
+Learn neural network model for translating sample video points to 2D field (*field.png*).
+###### kalman.py
+Prepare kalman filter class for player movement predictions
+
+### Wiki
+https://github.com/Th3NiKo/Football-players-detection/wiki
